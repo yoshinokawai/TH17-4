@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "thuchanh3",
-    "slug": "thuchanh3",
+    "name": "TH11-4",
+    "slug": "th11-4",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "scheme": "thuchanh3",
+    "scheme": "th11-4",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.thuchanh3"
