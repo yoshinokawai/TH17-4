@@ -1,27 +1,33 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { products } from '../data';
 
 const PRIMARY_COLOR = '#53B175';
 
+// Mock some favorite items from the products list
 const favouriteItems = [
-  { id: '1', title: 'Sprite Can', volume: '325ml, Price', price: 1.50, image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=400&q=80' },
-  { id: '2', title: 'Diet Coke', volume: '355ml, Price', price: 1.99, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
-  { id: '3', title: 'Apple & Grape Juice', volume: '2L, Price', price: 15.50, image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&q=80' },
-  { id: '4', title: 'Coca Cola Can', volume: '325ml, Price', price: 4.99, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
-  { id: '5', title: 'Pepsi Can', volume: '330ml, Price', price: 4.99, image: 'https://images.unsplash.com/photo-1629203851288-7ece11236502?w=400&q=80' },
-];
+  { ...products.find(p => p.id === '7') }, // Sprite Can
+  { ...products.find(p => p.id === '6') }, // Diet Coke
+  { ...products.find(p => p.id === '8') }, // Apple & Grape Juice
+  { ...products.find(p => p.id === '9') }, // Coca Cola Can
+  { ...products.find(p => p.id === '10') }, // Pepsi Can
+].filter(p => !!p.id) as any[];
 
 export default function FavouriteScreen() {
   const navigation = useNavigation<any>();
 
-  const renderItem = ({ item }: { item: typeof favouriteItems[0] }) => (
+  const handleAddAllToCart = () => {
+    Alert.alert("Cart", "All items have been added to your cart!", [{ text: "OK" }]);
+  };
+
+  const renderItem = ({ item }: { item: any }) => (
     <View style={styles.favouriteItem}>
       <Image source={{ uri: item.image }} style={styles.itemImage} />
       <View style={styles.itemContent}>
         <View style={styles.titleRow}>
-          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemTitle}>{item.name}</Text>
           <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
         </View>
         <View style={styles.volumeRow}>
@@ -37,7 +43,7 @@ export default function FavouriteScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Favorurite</Text>
+        <Text style={styles.headerTitle}>Favourite</Text>
       </View>
 
       <FlatList 
@@ -47,13 +53,21 @@ export default function FavouriteScreen() {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={styles.divider} />}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="heart-outline" size={64} color="#E2E2E2" />
+            <Text style={styles.emptyText}>No favorite items yet</Text>
+          </View>
+        }
       />
 
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.addAllButton}>
-          <Text style={styles.addAllText}>Add All To Cart</Text>
-        </TouchableOpacity>
-      </View>
+      {favouriteItems.length > 0 && (
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity style={styles.addAllButton} onPress={handleAddAllToCart}>
+            <Text style={styles.addAllText}>Add All To Cart</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -144,5 +158,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#7C7C7C',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

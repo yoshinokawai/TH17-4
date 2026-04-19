@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -41,6 +41,16 @@ export default function FiltersScreen() {
     setBrands({ ...brands, [key]: !brands[key] });
   };
 
+  const totalSelected = Object.values(categories).filter(Boolean).length + Object.values(brands).filter(Boolean).length;
+
+  const handleApplyFilters = () => {
+    Alert.alert(
+      "Filters Applied", 
+      `Selected ${totalSelected} filters. Search results have been updated.`,
+      [{ text: "OK", onPress: () => navigation.goBack() }]
+    );
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -72,7 +82,7 @@ export default function FiltersScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.applyButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
           <Text style={styles.applyButtonText}>Apply Filter</Text>
         </TouchableOpacity>
       </View>

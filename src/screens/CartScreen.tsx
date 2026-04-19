@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { products } from '../data';
 
 const PRIMARY_COLOR = '#53B175';
 
+// Mock some initial cart items from the products list
 const initialCart = [
-  { id: '1', title: 'Bell Pepper Red', volume: '1kg, Price', price: 4.99, image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=400&q=80', quantity: 1 },
-  { id: '2', title: 'Egg Chicken Red', volume: '4pcs, Price', price: 1.99, image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=400&q=80', quantity: 1 },
-  { id: '3', title: 'Organic Bananas', volume: '12kg, Price', price: 3.00, image: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&q=80', quantity: 1 },
-  { id: '4', title: 'Ginger', volume: '250gm, Price', price: 2.99, image: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?w=400&q=80', quantity: 1 },
-];
+  { ...products.find(p => p.id === '3'), quantity: 1 }, // Bell Pepper Red
+  { ...products.find(p => p.id === '5'), quantity: 1 }, // Egg Chicken Red
+  { ...products.find(p => p.id === '1'), quantity: 1 }, // Organic Bananas
+  { ...products.find(p => p.id === '4'), quantity: 1 }, // Ginger
+].filter(p => !!p.id) as any[];
 
 export default function CartScreen() {
   const [cartItems, setCartItems] = useState(initialCart);
@@ -29,12 +31,16 @@ export default function CartScreen() {
 
   const total = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
-  const renderItem = ({ item }: { item: typeof initialCart[0] }) => (
+  const handleCheckout = () => {
+    Alert.alert("Checkout", "Your order has been placed successfully!", [{ text: "OK" }]);
+  };
+
+  const renderItem = ({ item }: { item: any }) => (
     <View style={styles.cartItem}>
       <Image source={{ uri: item.image }} style={styles.itemImage} />
       <View style={styles.itemContent}>
         <View style={styles.titleRow}>
-          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemTitle}>{item.name}</Text>
           <TouchableOpacity onPress={() => removeItem(item.id)}>
             <Ionicons name="close" size={24} color="#B3B3B3" />
           </TouchableOpacity>
@@ -69,16 +75,24 @@ export default function CartScreen() {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={styles.divider} />}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="cart-outline" size={64} color="#E2E2E2" />
+            <Text style={styles.emptyText}>Your cart is empty</Text>
+          </View>
+        }
       />
 
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.checkoutButton}>
-          <Text style={styles.checkoutText}>Go to Checkout</Text>
-          <View style={styles.totalBadge}>
-            <Text style={styles.totalBadgeText}>${total.toFixed(2)}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      {cartItems.length > 0 && (
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+            <Text style={styles.checkoutText}>Go to Checkout</Text>
+            <View style={styles.totalBadge}>
+              <Text style={styles.totalBadgeText}>${total.toFixed(2)}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -202,5 +216,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#7C7C7C',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

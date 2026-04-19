@@ -1,34 +1,50 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { products, categories } from '../data';
 
-const categories = [
-  { id: '1', name: 'Fresh Fruits\n& Vegetable', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=80', color: 'rgba(83, 177, 117, 0.1)', borderColor: 'rgba(83, 177, 117, 0.7)' },
-  { id: '2', name: 'Cooking Oil\n& Ghee', image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80', color: 'rgba(248, 164, 76, 0.1)', borderColor: 'rgba(248, 164, 76, 0.7)' },
-  { id: '3', name: 'Meat & Fish', image: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80', color: 'rgba(247, 165, 147, 0.1)', borderColor: 'rgba(247, 165, 147, 0.7)' },
-  { id: '4', name: 'Bakery & Snacks', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80', color: 'rgba(211, 176, 224, 0.1)', borderColor: 'rgba(211, 176, 224, 0.7)' },
-  { id: '5', name: 'Dairy & Eggs', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80', color: 'rgba(253, 229, 152, 0.1)', borderColor: 'rgba(253, 229, 152, 0.7)' },
-  { id: '6', name: 'Beverages', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80', color: 'rgba(183, 223, 245, 0.1)', borderColor: 'rgba(183, 223, 245, 0.7)' },
-];
+const PRIMARY_COLOR = '#53B175';
+const { width } = Dimensions.get('window');
+const COLUMN_WIDTH = (width - 50) / 2;
 
 export default function ExploreScreen() {
   const navigation = useNavigation<any>();
+  const [searchText, setSearchText] = useState('');
+
+  const filteredProducts = useMemo(() => {
+    if (!searchText.trim()) return [];
+    return products.filter(item => 
+      item.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [searchText]);
 
   const renderCategory = ({ item }: { item: any }) => (
     <TouchableOpacity 
-      style={[styles.card, { backgroundColor: item.color, borderColor: item.borderColor }]}
+      style={[styles.categoryCard, { backgroundColor: item.color, borderColor: item.borderColor }]}
       onPress={() => {
-        if (item.name === 'Beverages') {
-          navigation.navigate('Beverages');
-        } else {
-          // just mock navigating to Beverages anyway for demonstration
-          navigation.navigate('Beverages', { category: item.name });
-        }
+        navigation.navigate('Beverages', { category: item.name });
       }}
     >
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <Text style={styles.cardTitle}>{item.name}</Text>
+      <Image source={{ uri: item.image }} style={styles.categoryImage} />
+      <Text style={styles.categoryTitle}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderProduct = ({ item }: { item: any }) => (
+    <TouchableOpacity 
+      style={styles.productCard}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
+      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <Text style={styles.productTitle}>{item.name}</Text>
+      <Text style={styles.productVolume}>{item.volume}</Text>
+      <View style={styles.productBottom}>
+        <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+        <TouchableOpacity style={styles.addButton}>
+          <Ionicons name="add" size={24} color="#FFF" />
+        </TouchableOpacity>
+      </View>
     </TouchableOpacity>
   );
 
@@ -43,20 +59,38 @@ export default function ExploreScreen() {
           placeholder="Search Store" 
           placeholderTextColor="#7C7C7C"
           style={styles.searchInput}
+          value={searchText}
+          onChangeText={setSearchText}
         />
         <TouchableOpacity onPress={() => navigation.navigate('Filters')}>
           <Ionicons name="options-outline" size={20} color="#181725" />
         </TouchableOpacity>
       </View>
 
-      <FlatList 
-        data={categories}
-        renderItem={renderCategory}
-        keyExtractor={item => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-      />
+      {searchText.trim() === '' ? (
+        <FlatList 
+          data={categories}
+          renderItem={renderCategory}
+          keyExtractor={item => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <FlatList 
+          data={filteredProducts}
+          renderItem={renderProduct}
+          keyExtractor={item => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No products found for "{searchText}"</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -96,7 +130,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingBottom: 20,
   },
-  card: {
+  categoryCard: {
     flex: 1,
     height: 190,
     margin: 5,
@@ -106,16 +140,70 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
   },
-  cardImage: {
+  categoryImage: {
     width: 90,
     height: 90,
     resizeMode: 'contain',
     marginBottom: 15,
   },
-  cardTitle: {
+  categoryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#181725',
     textAlign: 'center',
+  },
+  productCard: {
+    width: COLUMN_WIDTH,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E2E2E2',
+    borderRadius: 18,
+    padding: 15,
+    margin: 5,
+  },
+  productImage: {
+    width: 100,
+    height: 80,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  productTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#181725',
+    marginBottom: 5,
+  },
+  productVolume: {
+    fontSize: 14,
+    color: '#7C7C7C',
+    marginBottom: 15,
+  },
+  productBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  productPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#181725',
+  },
+  addButton: {
+    backgroundColor: PRIMARY_COLOR,
+    width: 45,
+    height: 45,
+    borderRadius: 17,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#7C7C7C',
   },
 });

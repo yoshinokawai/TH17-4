@@ -1,21 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { products } from '../data';
 
 const PRIMARY_COLOR = '#53B175';
 
-const beverages = [
-  { id: '1', title: 'Diet Coke', volume: '355ml, Price', price: '$1.99', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80', description: 'Diet Coke is an iconic brand and one of the most recognizable soft drinks in the world.' },
-  { id: '2', title: 'Sprite Can', volume: '325ml, Price', price: '$1.50', image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=400&q=80', description: 'Sprite is a clear, lemon and lime-flavored soft drink.' },
-  { id: '3', title: 'Apple & Grape Juice', volume: '2L, Price', price: '$15.99', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&q=80', description: 'Refreshing mix of Apple and Grape juice.' },
-  { id: '4', title: 'Orenge Juice', volume: '2L, Price', price: '$15.99', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&q=80', description: 'Pure orange juice packed with Vitamin C.' },
-  { id: '5', title: 'Coca Cola Can', volume: '325ml, Price', price: '$4.99', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80', description: 'Coca-Cola original taste.' },
-  { id: '6', title: 'Pepsi Can', volume: '330ml, Price', price: '$4.99', image: 'https://images.unsplash.com/photo-1629203851288-7ece11236502?w=400&q=80', description: 'Pepsi cola classic flavour.' },
-];
-
 export default function BeveragesScreen() {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const categoryName = route.params?.category || 'Beverages';
+
+  const categoryProducts = useMemo(() => {
+    // If category is not beverages, we filter by the passed name, 
+    // otherwise fallback to 'Beverages' as default
+    return products.filter(p => p.category === categoryName || (categoryName === 'Beverages' && p.category === 'Beverages'));
+  }, [categoryName]);
 
   const renderProduct = ({ item }: { item: any }) => (
     <TouchableOpacity 
@@ -23,10 +23,10 @@ export default function BeveragesScreen() {
       onPress={() => navigation.navigate('ProductDetail', { product: item })}
     >
       <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <Text style={styles.cardTitle}>{item.title}</Text>
+      <Text style={styles.cardTitle}>{item.name}</Text>
       <Text style={styles.cardVolume}>{item.volume}</Text>
       <View style={styles.cardBottomRow}>
-        <Text style={styles.cardPrice}>{item.price}</Text>
+        <Text style={styles.cardPrice}>${item.price.toFixed(2)}</Text>
         <TouchableOpacity style={styles.addButton} onPress={() => {}}>
           <Ionicons name="add" size={24} color="#FFF" />
         </TouchableOpacity>
@@ -41,20 +41,25 @@ export default function BeveragesScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="#181725" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Beverages</Text>
-        <TouchableOpacity style={styles.filterButton}>
+        <Text style={styles.headerTitle}>{categoryName}</Text>
+        <TouchableOpacity style={styles.filterButton} onPress={() => navigation.navigate('Filters')}>
           <Ionicons name="options-outline" size={24} color="#181725" />
         </TouchableOpacity>
       </View>
 
       {/* Grid */}
       <FlatList 
-        data={beverages}
+        data={categoryProducts}
         renderItem={renderProduct}
         keyExtractor={item => item.id}
         numColumns={2}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No products found in this category.</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -133,5 +138,14 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#7C7C7C',
   },
 });
