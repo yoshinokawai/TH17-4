@@ -3,12 +3,11 @@
 ## **Lớp: D18CNMP4**
 
 ## Demo Video:
+[📺 Click here to watch the Demo Video (Nếu video không tự chạy)](https://github.com/yoshinokawai/TH20-4/blob/main/TH_20_4_23810310260_Demo.mp4?raw=true)
 
-
-
-
-
-
+<video src="https://github.com/yoshinokawai/TH20-4/blob/main/TH_20_4_23810310260_Demo.mp4?raw=true" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
 
 ## Demo Images:
 ![image](Demo/23810310260_01_login.jpg)
