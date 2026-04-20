@@ -1,4 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CryptoJS from 'crypto-js';
+
+const SECRET_KEY = 'nectar-app-secret-2026';
+const SESSION_TTL = 24 * 60 * 60 * 1000; // 24 hours in ms
 
 const KEYS = {
   USER: 'user_session',
@@ -7,12 +11,38 @@ const KEYS = {
   ORDERS: 'order_history',
 };
 
+// Helper: Encrypt data
+const encrypt = (data) => {
+  try {
+    return CryptoJS.AES.encrypt(data, SECRET_KEY).toString();
+  } catch (e) {
+    console.error('Encryption error:', e);
+    return data;
+  }
+};
+
+// Helper: Decrypt data
+const decrypt = (ciphertext) => {
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  } catch (e) {
+    console.error('Decryption error:', e);
+    return null;
+  }
+};
+
 const storageService = {
   // --- USER AUTH ---
   saveUser: async (userData) => {
     try {
-      const jsonValue = JSON.stringify(userData);
-      await AsyncStorage.setItem(KEYS.USER, jsonValue);
+      const sessionData = {
+        ...userData,
+        expiresAt: Date.now() + SESSION_TTL
+      };
+      const jsonValue = JSON.stringify(sessionData);
+      const encryptedValue = encrypt(jsonValue);
+      await AsyncStorage.setItem(KEYS.USER, encryptedValue);
     } catch (e) {
       console.error('Error saving user:', e);
     }
@@ -20,8 +50,22 @@ const storageService = {
 
   getUser: async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem(KEYS.USER);
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
+      const encryptedValue = await AsyncStorage.getItem(KEYS.USER);
+      if (!encryptedValue) return null;
+
+      const decryptedValue = decrypt(encryptedValue);
+      if (!decryptedValue) return null;
+
+      const sessionData = JSON.parse(decryptedValue);
+      
+      // Check for expiry
+      if (Date.now() > sessionData.expiresAt) {
+        console.log('Session expired, clearing user data...');
+        await storageService.removeUser();
+        return null;
+      }
+
+      return sessionData;
     } catch (e) {
       console.error('Error getting user:', e);
       return null;
@@ -40,7 +84,8 @@ const storageService = {
   saveCart: async (cartItems) => {
     try {
       const jsonValue = JSON.stringify(cartItems);
-      await AsyncStorage.setItem(KEYS.CART, jsonValue);
+      const encryptedValue = encrypt(jsonValue);
+      await AsyncStorage.setItem(KEYS.CART, encryptedValue);
     } catch (e) {
       console.error('Error saving cart:', e);
     }
@@ -48,8 +93,11 @@ const storageService = {
 
   getCart: async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem(KEYS.CART);
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
+      const encryptedValue = await AsyncStorage.getItem(KEYS.CART);
+      if (!encryptedValue) return [];
+      
+      const decryptedValue = decrypt(encryptedValue);
+      return decryptedValue ? JSON.parse(decryptedValue) : [];
     } catch (e) {
       console.error('Error getting cart:', e);
       return [];
@@ -60,7 +108,8 @@ const storageService = {
   saveFavourites: async (favItems) => {
     try {
       const jsonValue = JSON.stringify(favItems);
-      await AsyncStorage.setItem(KEYS.FAVOURITES, jsonValue);
+      const encryptedValue = encrypt(jsonValue);
+      await AsyncStorage.setItem(KEYS.FAVOURITES, encryptedValue);
     } catch (e) {
       console.error('Error saving favourites:', e);
     }
@@ -68,8 +117,11 @@ const storageService = {
 
   getFavourites: async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem(KEYS.FAVOURITES);
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
+      const encryptedValue = await AsyncStorage.getItem(KEYS.FAVOURITES);
+      if (!encryptedValue) return [];
+      
+      const decryptedValue = decrypt(encryptedValue);
+      return decryptedValue ? JSON.parse(decryptedValue) : [];
     } catch (e) {
       console.error('Error getting favourites:', e);
       return [];
@@ -80,7 +132,8 @@ const storageService = {
   saveOrders: async (orders) => {
     try {
       const jsonValue = JSON.stringify(orders);
-      await AsyncStorage.setItem(KEYS.ORDERS, jsonValue);
+      const encryptedValue = encrypt(jsonValue);
+      await AsyncStorage.setItem(KEYS.ORDERS, encryptedValue);
     } catch (e) {
       console.error('Error saving orders:', e);
     }
@@ -88,8 +141,11 @@ const storageService = {
 
   getOrders: async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem(KEYS.ORDERS);
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
+      const encryptedValue = await AsyncStorage.getItem(KEYS.ORDERS);
+      if (!encryptedValue) return [];
+      
+      const decryptedValue = decrypt(encryptedValue);
+      return decryptedValue ? JSON.parse(decryptedValue) : [];
     } catch (e) {
       console.error('Error getting orders:', e);
       return [];

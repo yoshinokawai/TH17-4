@@ -5,6 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import { products, categories } from '../data';
 import { useCart } from '../context/CartContext';
 
+import { useStorage } from '../hooks/useStorage';
+import { SkeletonItem } from '../components/SkeletonItem';
+
 const MAX_WIDTH = 800;
 const PRIMARY_COLOR = '#53B175';
 const { width: windowWidth } = Dimensions.get('window');
@@ -15,6 +18,14 @@ export default function ExploreScreen() {
   const navigation = useNavigation<any>();
   const [searchText, setSearchText] = useState('');
   const { addToCart } = useCart();
+  const { loading } = useStorage('user', null); // Simulated load
+
+  const renderSkeletonCategory = () => (
+    <View style={[styles.categoryCard, { backgroundColor: '#F2F3F2', borderColor: '#E2E2E2' }]}>
+      <SkeletonItem width={90} height={90} borderRadius={18} style={{ marginBottom: 15 }} />
+      <SkeletonItem width={100} height={20} />
+    </View>
+  );
 
   const filteredProducts = useMemo(() => {
     if (!searchText.trim()) return [];
@@ -74,9 +85,9 @@ export default function ExploreScreen() {
 
         {searchText.trim() === '' ? (
           <FlatList 
-            data={categories}
-            renderItem={renderCategory}
-            keyExtractor={item => item.id}
+            data={loading ? [1, 2, 3, 4, 5, 6] : categories}
+            renderItem={loading ? renderSkeletonCategory : renderCategory}
+            keyExtractor={(item, index) => loading ? `skeleton-${index}` : item.id}
             numColumns={2}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}

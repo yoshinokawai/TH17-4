@@ -5,6 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import { products } from '../data';
 import { useCart } from '../context/CartContext';
 
+import { useStorage } from '../hooks/useStorage';
+import { SkeletonItem } from '../components/SkeletonItem';
+
 const PRIMARY_COLOR = '#53B175';
 
 const exclusiveOffers = products.slice(0, 6);
@@ -13,6 +16,7 @@ const bestSelling = products.slice(6, 12);
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
   const { addToCart } = useCart();
+  const { loading } = useStorage('user', null); // Simulated load
 
   const renderProductItem = ({ item }: { item: any }) => (
     <TouchableOpacity 
@@ -29,6 +33,18 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
+  );
+
+  const renderSkeleton = () => (
+    <View style={styles.card}>
+      <SkeletonItem width={100} height={80} style={{ alignSelf: 'center', marginBottom: 10 }} />
+      <SkeletonItem width="80%" height={20} style={{ marginBottom: 5 }} />
+      <SkeletonItem width="50%" height={15} style={{ marginBottom: 15 }} />
+      <View style={styles.cardBottomRow}>
+        <SkeletonItem width={60} height={25} />
+        <SkeletonItem width={45} height={45} borderRadius={17} />
+      </View>
+    </View>
   );
 
   return (
@@ -70,9 +86,9 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         <FlatList 
-          data={exclusiveOffers}
-          renderItem={renderProductItem}
-          keyExtractor={item => item.id}
+          data={loading ? [1, 2, 3] : exclusiveOffers}
+          renderItem={loading ? renderSkeleton : renderProductItem}
+          keyExtractor={(item, index) => loading ? `skeleton-${index}` : item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.horizontalList}
@@ -86,9 +102,9 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         <FlatList 
-          data={bestSelling}
-          renderItem={renderProductItem}
-          keyExtractor={item => item.id}
+          data={loading ? [1, 2, 3] : bestSelling}
+          renderItem={loading ? renderSkeleton : renderProductItem}
+          keyExtractor={(item, index) => loading ? `skeleton-${index}` : item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={[styles.horizontalList, { marginBottom: 30 }]}

@@ -3,25 +3,18 @@
 ## **Lớp: D18CNMP4**
 
 ## Demo Video:
-![Demo Video](TH_20_4_23810310260_Demo.7z)
+![Demo Video](TH_20_4_23810310260_Demo.mp4)
 
 ## Demo Images:
-![image](Demo/23810310260-01.jpg)
-![image](Demo/23810310260-02.jpg)
-![image](Demo/23810310260-03.jpg)
-![image](Demo/23810310260-04.jpg)
-![image](Demo/23810310260-05.jpg)
-![image](Demo/23810310260-06.jpg)
-![image](Demo/23810310260-07.jpg)
-![image](Demo/23810310260-08.jpg)
-![image](Demo/23810310260-09.jpg)
-![image](Demo/23810310260-10.jpg)
-![image](Demo/23810310260-11.jpg)
-![image](Demo/23810310260-12.jpg)
-![image](Demo/23810310260-13.jpg)
-![image](Demo/23810310260-14.jpg)
-![image](Demo/23810310260-15.jpg)
-![image](Demo/23810310260-16.jpg)   
+![image](Demo/23810310260_01_login.jpg)
+![image](Demo/23810310260_02_Reloadapp.png)
+![image](Demo/23810310260_03_Autologin.png)
+![image](Demo/23810310260_04_Logout_back_to_login.png)
+![image](Demo/23810310260_05_Add_to_cart.png)
+![image](Demo/23810310260_06_Cart.png)
+![image](Demo/23810310260_07_Checkout.png)
+![image](Demo/23810310260_08_Checkout_accepted.png)
+![image](Demo/23810310260_09_Profile.png)   
 
 ---
 
