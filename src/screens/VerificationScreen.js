@@ -66,6 +66,9 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 25,
     marginTop: 40,
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center',
   },
   title: {
     fontSize: 26,

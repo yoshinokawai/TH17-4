@@ -82,6 +82,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 25,
     paddingTop: 10,
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center',
   },
   title: {
     fontSize: 26,

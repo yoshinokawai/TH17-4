@@ -1,14 +1,28 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
+import storageService from '../services/storageService';
+
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
-    // Tự động chuyển sang màn hình Onboarding sau 2.5 giây
-    const timer = setTimeout(() => {
-      navigation.replace('Onboarding');
-    }, 2500);
-    return () => clearTimeout(timer);
+    const checkLogin = async () => {
+      const user = await storageService.getUser();
+      
+      // Đợi một chút để người dùng thấy Splash Screen (giống như ý định ban đầu là 2.5s)
+      setTimeout(() => {
+        if (user) {
+          // Nếu đã đăng nhập, vào thẳng Home (MainTabs)
+          navigation.replace('Home');
+        } else {
+          // Nếu chưa, vào Onboarding
+          navigation.replace('Onboarding');
+        }
+      }, 2500);
+    };
+
+    checkLogin();
   }, [navigation]);
+
 
   return (
     <View style={styles.container}>

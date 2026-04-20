@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Image, TextInput, ScrollView } from 'react-native';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 
 const LocationScreen = ({ navigation }) => {
@@ -16,52 +16,60 @@ const LocationScreen = ({ navigation }) => {
         <Ionicons name="chevron-back" size={28} color="#181725" />
       </TouchableOpacity>
 
-      <View style={styles.content}>
-        {/* Ảnh minh họa: Tạm dùng Icon, nếu có ảnh bạn thay bằng thẻ <Image /> */}
-        <View style={styles.illustrationContainer}>
-            <Image 
-              source={require('../../assets/images/map.png')} // Đảm bảo đường dẫn này đúng với máy bạn
-              style={{ width: 200, height: 200 }}
-              resizeMode="contain"
-            />
-        </View>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          {/* Ảnh minh họa: Tạm dùng Icon, nếu có ảnh bạn thay bằng thẻ <Image /> */}
+          <View style={styles.illustrationContainer}>
+              <Image 
+                source={require('../../assets/images/map.png')} // Đảm bảo đường dẫn này đúng với máy bạn
+                style={{ width: 200, height: 200 }}
+                resizeMode="contain"
+              />
+          </View>
 
-        <Text style={styles.title}>Select Your Location</Text>
-        <Text style={styles.subtitle}>
-          Switch on your location to stay in tune with what's happening in your area
-        </Text>
+          <Text style={styles.title}>Select Your Location</Text>
+          <Text style={styles.subtitle}>
+            Switch on your location to stay in tune with what's happening in your area
+          </Text>
 
-        {/* Input: Your Zone */}
-        <View style={styles.dropdownContainer}>
-          <Text style={styles.dropdownLabel}>Your Zone</Text>
-          <TouchableOpacity style={styles.dropdownInput} activeOpacity={0.7}>
-            <Text style={[styles.dropdownText, !zone && { color: '#7C7C7C' }]}>
-              {zone || 'Types of your zone'}
-            </Text>
-            <Ionicons name="chevron-down" size={20} color="#7C7C7C" />
+          {/* Input: Your Zone */}
+          <View style={styles.dropdownContainer}>
+            <Text style={styles.dropdownLabel}>Your Zone</Text>
+            <View style={styles.dropdownInput}>
+              <TextInput
+                style={styles.textInput}
+                value={zone}
+                onChangeText={setZone}
+                placeholder="Types of your zone"
+                placeholderTextColor="#7C7C7C"
+              />
+            </View>
+          </View>
+
+          {/* Input: Your Area */}
+          <View style={styles.dropdownContainer}>
+            <Text style={styles.dropdownLabel}>Your Area</Text>
+            <View style={styles.dropdownInput}>
+              <TextInput
+                style={styles.textInput}
+                value={area}
+                onChangeText={setArea}
+                placeholder="Types of your area"
+                placeholderTextColor="#7C7C7C"
+              />
+            </View>
+          </View>
+
+          {/* Nút Submit */}
+          <TouchableOpacity 
+            style={styles.submitButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Login')} 
+          >
+            <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Input: Your Area */}
-        <View style={styles.dropdownContainer}>
-          <Text style={styles.dropdownLabel}>Your Area</Text>
-          <TouchableOpacity style={styles.dropdownInput} activeOpacity={0.7}>
-            <Text style={[styles.dropdownText, !area && { color: '#7C7C7C' }]}>
-              {area || 'Types of your area'}
-            </Text>
-            <Ionicons name="chevron-down" size={20} color="#7C7C7C" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Nút Submit */}
-        <TouchableOpacity 
-          style={styles.submitButton}
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('Login')} 
-        >
-          <Text style={styles.submitButtonText}>Submit</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -78,11 +86,18 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    marginTop: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center',
   },
   illustrationContainer: {
     marginBottom: 40,
@@ -132,6 +147,13 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     alignItems: 'center',
     marginTop: 20,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 18,
+    color: '#181725',
+    fontWeight: '500',
+    paddingVertical: 5,
   },
   submitButtonText: {
     color: '#FFF',

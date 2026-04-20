@@ -6,17 +6,10 @@ import HomeScreen from '../screens/HomeScreen';
 import ExploreScreen from '../screens/ExploreScreen';
 import CartScreen from '../screens/CartScreen';
 import FavouriteScreen from '../screens/FavouriteScreen';
-
-// Mocks for other tabs
-import { View, Text } from 'react-native';
+import AccountScreen from '../screens/AccountScreen';
 
 const Tab = createBottomTabNavigator();
 
-const MockScreen = ({ name }: { name: string }) => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>{name} Screen</Text>
-  </View>
-);
 
 export default function MainTabs() {
   return (
@@ -42,10 +35,9 @@ export default function MainTabs() {
         tabBarActiveTintColor: '#53B175',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
-        tabBarStyle: {
+        tabBarLabelStyle: {
           paddingBottom: 5,
           paddingTop: 5,
-          height: 60,
         },
       })}
     >
@@ -53,7 +45,7 @@ export default function MainTabs() {
       <Tab.Screen name="Explore" component={ExploreScreen} />
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
-      <Tab.Screen name="Account" children={() => <MockScreen name="Account" />} />
+      <Tab.Screen name="Account" component={AccountScreen} />
     </Tab.Navigator>
   );
 }
